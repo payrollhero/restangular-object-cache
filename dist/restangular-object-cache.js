@@ -1,9 +1,9 @@
 var mod;
 
-mod = angular.module('restangular-roc', ['restangular']);
+mod = angular.module('restangular-object-cache', ['restangular']);
 
 mod.service('RestangularObjectCache', function(Restangular) {
-  var HasManyDefinition, HasOneDefinition, ObjectCache, RelationshipsDefiner, addIndex, createTracking, guessKeyFromModelName, guessModelNameFromSingular, objectCaches, relationshipDefinitions, valuesAt, wireModel, wireRelationships;
+  var HasManyDefinition, HasOneDefinition, ObjectCache, RelationshipsDefiner, addIndex, createTracking, guessKeyFromModelName, guessModelNameFromSingular, objectCaches, relationshipDefinitions, validateModelName, valuesAt, wireModel, wireRelationships;
   guessKeyFromModelName = function(modelName) {
     return _.singularize(modelName) + "_id";
   };
@@ -78,6 +78,13 @@ mod.service('RestangularObjectCache', function(Restangular) {
       return this.definitions.push(definition);
     };
 
+    RelationshipsDefiner.prototype.belongsTo = function(methodName, options) {
+      if (options == null) {
+        options = {};
+      }
+      return this.hasOne(methodName, options);
+    };
+
     return RelationshipsDefiner;
 
   })();
@@ -91,7 +98,6 @@ mod.service('RestangularObjectCache', function(Restangular) {
 
     ObjectCache.prototype.addObject = function(object) {
       var id, index, key, name1, ref;
-      console.log("Adding object to cache " + this.modelName, object);
       id = object[this.primaryKey];
       this.objects[id] = object;
       ref = this.indexes;
@@ -104,7 +110,6 @@ mod.service('RestangularObjectCache', function(Restangular) {
 
     ObjectCache.prototype.removeObject = function(object) {
       var id, index, key, ref, results;
-      console.log("Removing object from cache " + this.modelName, object);
       id = object[this.primaryKey];
       delete this.objects[id];
       ref = this.indexes;
@@ -118,6 +123,10 @@ mod.service('RestangularObjectCache', function(Restangular) {
 
     ObjectCache.prototype.addIndex = function(key) {
       return this.indexes[key] = {};
+    };
+
+    ObjectCache.prototype.all = function() {
+      return _(this.objects).values();
     };
 
     ObjectCache.prototype.firstMatchingKey = function(keyName, keyValue) {
@@ -171,6 +180,11 @@ mod.service('RestangularObjectCache', function(Restangular) {
       return model;
     });
   };
+  validateModelName = function(modelName) {
+    if (!objectCaches[modelName]) {
+      throw "Not currently tracking " + modelName + "!  Use RestangularObjectCache.track(" + modelName + ")";
+    }
+  };
   objectCaches = {};
   relationshipDefinitions = {};
   this.defineRelationships = function(modelName, definitionCb) {
@@ -181,7 +195,16 @@ mod.service('RestangularObjectCache', function(Restangular) {
     addIndex(modelName, indexName);
   };
   this.removeObject = function(modelName, object) {
+    validateModelName(modelName);
     return objectCaches[modelName].removeObject(object);
+  };
+  this.all = function(modelName) {
+    validateModelName(modelName);
+    return objectCaches[modelName].all();
+  };
+  this.allBy = function(modelName, attribute, value) {
+    validateModelName(modelName);
+    return objectCaches[modelName].allMatchingKey(attribute, value);
   };
   this.track = function(modelName, options) {
     if (options == null) {
@@ -190,5 +213,9 @@ mod.service('RestangularObjectCache', function(Restangular) {
     options.key || (options.key = 'id');
     options.service || (options.service = Restangular);
     return createTracking(modelName, options.key, options.service);
+  };
+  this.clear = function() {
+    objectCaches = {};
+    return relationshipDefinitions = {};
   };
 });
