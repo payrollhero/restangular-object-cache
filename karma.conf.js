@@ -9,10 +9,18 @@ module.exports = function (config) {
       'bower_components/angular-mocks/angular-mocks.js',
       'bower_components/sinonjs/sinon.js',
       'bower_components/underscore/underscore.js',
+      'bower_components/underscore.inflection/lib/underscore.inflection.js',
       'bower_components/restangular/dist/restangular.js',
+      'bower_components/jquery/dist/jquery.js',
+      'bower_components/jasmine-jquery/lib/jasmine-jquery.js',
       'src/*.coffee',
       'spec/test_support.coffee',
       'spec/**.coffee',
+      // fixtures
+      { pattern:  'spec/fixtures/*.json',
+        watched:  true,
+        served:   true,
+        included: false }
     ],
     exclude: [],
     port: 8080,

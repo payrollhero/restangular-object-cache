@@ -15,4 +15,6 @@ window.before = beforeEach
 
 window.initializeModule = ->
   before ->
-      module('angular-advanced-poller')
+    module('restangular-object-cache')
+
+jasmine.getJSONFixtures().fixturesPath = 'base/spec/fixtures'

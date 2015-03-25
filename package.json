@@ -6,7 +6,7 @@
     "karma": "~0.12.31",
     "gulp-uglifyjs": "~0.6.1"
   },
-  "repository" : "https://github.com/payrollhero/restangular-object-cache.git",
+  "repository": "https://github.com/payrollhero/restangular-object-cache.git",
   "devDependencies": {
     "karma": "~0.12.27",
     "karma-ng-html2js-preprocessor": "^0.1.0",
@@ -22,7 +22,8 @@
     "gulp-ng-annotate": "~0.5.2",
     "gulp-uglifyjs": "~0.5.0",
     "run-sequence": "~1.0.2",
-    "del": "~1.1.1"
+    "del": "~1.1.1",
+    "karma-fixture": "~0.2.3"
   },
   "engines": {
     "node": ">=0.10.0"

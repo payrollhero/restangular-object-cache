@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "account_id" : 1,
+    "other_id" : 2,
+    "name": "John"
+  },
+  {
+    "id": 2,
+    "account_id" : 1,
+    "other_id" : 1,
+    "name": "Mary"
+  },
+  {
+    "id": 3,
+    "account_id" : 2,
+    "other_id" : 1,
+    "name": "Kyle"
+  }
+]

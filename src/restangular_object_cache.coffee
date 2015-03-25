@@ -4,7 +4,7 @@
 # @ngdoc module
 # @name payrollhero.api
 # @module
-mod = angular.module('restangular-roc', ['restangular'])
+mod = angular.module('restangular-object-cache', ['restangular'])
 mod.service 'RestangularObjectCache', (Restangular) ->
   guessKeyFromModelName = (modelName) ->
     _.singularize(modelName) + "_id"
@@ -52,6 +52,9 @@ mod.service 'RestangularObjectCache', (Restangular) ->
       definition = new HasOneDefinition(methodName, options)
       @definitions.push(definition)
 
+    belongsTo: (methodName, options = {}) ->
+      @hasOne(methodName, options)
+
   class ObjectCache
     constructor: (modelName, primaryKey) ->
       @modelName = modelName
@@ -60,7 +63,6 @@ mod.service 'RestangularObjectCache', (Restangular) ->
       @indexes = {}
 
     addObject: (object) ->
-      console.log("Adding object to cache #{@modelName}", object)
       id = object[@primaryKey]
       @objects[id] = object
       for key, index  of @indexes
@@ -69,7 +71,6 @@ mod.service 'RestangularObjectCache', (Restangular) ->
       return
 
     removeObject: (object) ->
-      console.log("Removing object from cache #{@modelName}", object)
       id = object[@primaryKey]
       delete @objects[id]
       for key, index of @indexes
@@ -77,6 +78,9 @@ mod.service 'RestangularObjectCache', (Restangular) ->
 
     addIndex: (key) ->
       @indexes[key] = {}
+
+    all: ->
+      _(@objects).values()
 
     firstMatchingKey: (keyName, keyValue) ->
       _.first(@allMatchingKey(keyName, keyValue))
@@ -115,11 +119,16 @@ mod.service 'RestangularObjectCache', (Restangular) ->
       wireRelationships(modelName, model)
       return model
 
+  validateModelName = (modelName) ->
+    unless objectCaches[modelName]
+      throw "Not currently tracking #{modelName}!  Use RestangularObjectCache.track(#{modelName})"
+
   #our most fundamental store.
   objectCaches = {}
   relationshipDefinitions = {}
 
   @defineRelationships = (modelName, definitionCb) ->
+
     relationshipDefinitions[modelName] = new RelationshipsDefiner(modelName)
     definitionCb(relationshipDefinitions[modelName])
 
@@ -128,11 +137,24 @@ mod.service 'RestangularObjectCache', (Restangular) ->
     return
 
   @removeObject = (modelName, object) ->
+    validateModelName(modelName)
     objectCaches[modelName].removeObject(object)
+
+  @all = (modelName) ->
+    validateModelName(modelName)
+    objectCaches[modelName].all()
+
+  @allBy = (modelName, attribute, value) ->
+    validateModelName(modelName)
+    objectCaches[modelName].allMatchingKey(attribute, value)
 
   @track = (modelName, options = {}) ->
     options.key ||= 'id'
     options.service ||= Restangular
     createTracking(modelName, options.key, options.service)
+
+  @clear = ->
+    objectCaches = {}
+    relationshipDefinitions = {}
 
   return
