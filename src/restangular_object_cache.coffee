@@ -2,7 +2,7 @@
 #= require_directory .
 
 # @ngdoc module
-# @name payrollhero.api
+# @name restangular-object-cache
 # @module
 mod = angular.module('restangular-object-cache', ['restangular'])
 mod.service 'RestangularObjectCache', (Restangular) ->
