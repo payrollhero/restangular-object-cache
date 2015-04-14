@@ -73,9 +73,11 @@ mod.service 'RestangularObjectCache', (Restangular) ->
 
     removeObject: (object) ->
       id = object[@primaryKey]
+      oldObject = @objects[id]
+      return unless oldObject
       delete @objects[id]
       for key, index of @indexes
-        index[object[key]] = _(index[object[key]] || []).without(id)
+        index[oldObject[key]] = _(index[oldObject[key]] || []).without(id)
 
     addIndex: (key) ->
       @indexes[key] = {}
