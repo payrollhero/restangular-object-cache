@@ -99,9 +99,7 @@ mod.service('RestangularObjectCache', function(Restangular) {
     ObjectCache.prototype.addOrUpdateObject = function(object) {
       var id, index, key, name1, ref;
       id = object[this.primaryKey];
-      if (this.objects[id]) {
-        this.removeObject(object);
-      }
+      this.removeObject(object);
       this.objects[id] = object;
       ref = this.indexes;
       for (key in ref) {

@@ -64,7 +64,7 @@ mod.service 'RestangularObjectCache', (Restangular) ->
 
     addOrUpdateObject: (object) ->
       id = object[@primaryKey]
-      @removeObject(object) if @objects[id]
+      @removeObject(object)
       @objects[id] = object
       for key, index  of @indexes
         index[object[key]] ||= []
