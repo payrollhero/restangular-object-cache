@@ -1,6 +1,6 @@
 {
   "name": "restangular-object-cache",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "dependencies": {
     "gulp-concat": "~2.5.2",
     "karma": "~0.12.31",

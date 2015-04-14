@@ -43,6 +43,16 @@ describe 'RestangularObjectCache', ->
       expect(_(_(subject.allBy('employees','account_id', 1))).pluck("id")).toEqual([2])
       expect(_(_(subject.allBy('employees','other_id', 2))).pluck("id")).toEqual([])
 
+    it 'adding an object a second time with the same ID does not duplicate it', ->
+      $httpBackend.expectGET("/employees").respond(getJSONFixture('employees_response.json'))
+      service.getList()
+      $httpBackend.flush()
+      expect(_(subject.all('employees')).pluck("id")).toEqual([1, 2, 3])
+      expect(_(_(subject.allBy('employees','other_id', 1))).pluck("id")).toEqual([2,3])
+      expect(_(_(subject.allBy('employees','other_id', 2))).pluck("id")).toEqual([1])
+      expect(_(_(subject.allBy('employees','account_id', 1))).pluck("id")).toEqual([1,2])
+      expect(_(_(subject.allBy('employees','account_id', 2))).pluck("id")).toEqual([3])
+
   describe 'hasMany and belongsTo', ->
     subject = {}
     EmployeesService = {}

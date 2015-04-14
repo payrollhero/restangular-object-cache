@@ -96,9 +96,12 @@ mod.service('RestangularObjectCache', function(Restangular) {
       this.indexes = {};
     }
 
-    ObjectCache.prototype.addObject = function(object) {
+    ObjectCache.prototype.addOrUpdateObject = function(object) {
       var id, index, key, name1, ref;
       id = object[this.primaryKey];
+      if (this.objects[id]) {
+        this.removeObject(object);
+      }
       this.objects[id] = object;
       ref = this.indexes;
       for (key in ref) {
@@ -175,7 +178,7 @@ mod.service('RestangularObjectCache', function(Restangular) {
     specificCache = new ObjectCache(modelName, key);
     objectCaches[modelName] = specificCache;
     return service.extendModel(modelName, function(model) {
-      specificCache.addObject(model);
+      specificCache.addOrUpdateObject(model);
       wireRelationships(modelName, model);
       return model;
     });
