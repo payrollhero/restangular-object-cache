@@ -62,8 +62,9 @@ mod.service 'RestangularObjectCache', (Restangular) ->
       @primaryKey = primaryKey
       @indexes = {}
 
-    addObject: (object) ->
+    addOrUpdateObject: (object) ->
       id = object[@primaryKey]
+      @removeObject(object)
       @objects[id] = object
       for key, index  of @indexes
         index[object[key]] ||= []
@@ -72,9 +73,11 @@ mod.service 'RestangularObjectCache', (Restangular) ->
 
     removeObject: (object) ->
       id = object[@primaryKey]
+      oldObject = @objects[id]
+      return unless oldObject
       delete @objects[id]
       for key, index of @indexes
-        index[object[key]] = _(index[object[key]] || []).without(id)
+        index[oldObject[key]] = _(index[oldObject[key]] || []).without(id)
 
     addIndex: (key) ->
       @indexes[key] = {}
@@ -115,7 +118,7 @@ mod.service 'RestangularObjectCache', (Restangular) ->
     specificCache = new ObjectCache(modelName, key)
     objectCaches[modelName] = specificCache
     service.extendModel modelName, (model) ->
-      specificCache.addObject(model)
+      specificCache.addOrUpdateObject(model)
       wireRelationships(modelName, model)
       return model
 
