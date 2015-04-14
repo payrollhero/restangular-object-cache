@@ -112,14 +112,18 @@ mod.service('RestangularObjectCache', function(Restangular) {
     };
 
     ObjectCache.prototype.removeObject = function(object) {
-      var id, index, key, ref, results;
+      var id, index, key, oldObject, ref, results;
       id = object[this.primaryKey];
+      oldObject = this.objects[id];
+      if (!oldObject) {
+        return;
+      }
       delete this.objects[id];
       ref = this.indexes;
       results = [];
       for (key in ref) {
         index = ref[key];
-        results.push(index[object[key]] = _(index[object[key]] || []).without(id));
+        results.push(index[oldObject[key]] = _(index[oldObject[key]] || []).without(id));
       }
       return results;
     };
