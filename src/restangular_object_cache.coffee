@@ -100,7 +100,7 @@ mod.service 'RestangularObjectCache', (Restangular) ->
         _(@objects).chain().values().where(whereClause).value()
 
   wireModel = (relationshipsDefiner, model) ->
-    for definition in relationshipsDefiner.definitions
+    _(relationshipsDefiner.definitions).map (definition) ->
       model[definition.methodName] = ->
         definition.fullfillRelation(model)
     return
