@@ -3,18 +3,21 @@
     "id": 1,
     "account_id" : 1,
     "other_id" : 2,
+    "worksite_id" : 1,
     "name": "John"
   },
   {
     "id": 2,
     "account_id" : 1,
     "other_id" : 1,
+    "worksite_id" : 1,
     "name": "Mary"
   },
   {
     "id": 3,
     "account_id" : 2,
     "other_id" : 1,
+    "worksite_id" : 2,
     "name": "Kyle"
   }
 ]

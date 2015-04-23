@@ -93,4 +93,45 @@ describe 'RestangularObjectCache', ->
       employees = subject.all('employees')
       expect(employees[0].account().id).toEqual(1)
 
+  describe 'multiple belongsTo', ->
+    before ->
+      angular.module('restangular-object-cache').factory 'EmployeesService', (Restangular, RestangularObjectCache) ->
+        RestangularObjectCache.track 'employees'
+        RestangularObjectCache.index 'employees', 'account_id'
+        RestangularObjectCache.index 'employees', 'worksite_id'
+        RestangularObjectCache.defineRelationships 'employees', (relationships) ->
+          relationships.belongsTo 'account'
+          relationships.belongsTo 'worksite'
+
+        return Restangular.service('employees')
+
+      angular.module('restangular-object-cache').factory 'WorksitesService', (Restangular, RestangularObjectCache) ->
+        RestangularObjectCache.track 'worksites'
+        return Restangular.service('worksites')
+
+    subject = {}
+    EmployeesService = {}
+    AccountsService = {}
+    WorksitesService = {}
+
+    before inject (_RestangularObjectCache_, _EmployeesService_, _AccountsService_, _WorksitesService_, _$httpBackend_) ->
+      subject = _RestangularObjectCache_
+      EmployeesService = _EmployeesService_
+      AccountsService = _AccountsService_
+      WorksitesService = _WorksitesService_
+      $httpBackend = _$httpBackend_
+      $httpBackend.expectGET("/employees").respond(getJSONFixture('employees_response.json'))
+      $httpBackend.expectGET("/accounts").respond(getJSONFixture('accounts_response.json'))
+      $httpBackend.expectGET("/worksites").respond(getJSONFixture('worksites_response.json'))
+      EmployeesService.getList()
+      AccountsService.getList()
+      WorksitesService.getList()
+      $httpBackend.flush()
+
+    it 'hangs both account and worksite off the employee', ->
+      employees = subject.all('employees')
+      employee = employees[0]
+      expect(employee.account().name).toEqual("AppleSeed Corp")
+      expect(employee.worksite().name).toEqual("Apple Orchard")
+
 
