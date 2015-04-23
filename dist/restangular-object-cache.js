@@ -156,14 +156,11 @@ mod.service('RestangularObjectCache', function(Restangular) {
 
   })();
   wireModel = function(relationshipsDefiner, model) {
-    var definition, i, len, ref;
-    ref = relationshipsDefiner.definitions;
-    for (i = 0, len = ref.length; i < len; i++) {
-      definition = ref[i];
-      model[definition.methodName] = function() {
+    _(relationshipsDefiner.definitions).map(function(definition) {
+      return model[definition.methodName] = function() {
         return definition.fullfillRelation(model);
       };
-    }
+    });
   };
   wireRelationships = function(modelName, model) {
     var relationshipDefiner;
