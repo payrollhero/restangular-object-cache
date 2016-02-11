@@ -1,12 +1,13 @@
 {
   "name": "restangular-object-cache",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "homepage": "https://github.com/payrollhero/restangular-object-cache",
   "authors": [
-    "bramski <bwhillock@payrollhero.com>"
+    "bramski <bwhillock@payrollhero.com>",
+    "Myk <mkyryk@payrollhero.com"
   ],
   "description": "A Restangular Service for caching objects and wiring relationships.",
-  "main": "dist/angular-advanced-poller.min.js",
+  "main": "dist/restangular-object-cache.min.js",
   "keywords": [
     "angularjs",
     "restangular",
