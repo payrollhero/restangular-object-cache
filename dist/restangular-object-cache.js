@@ -3,7 +3,7 @@ var mod;
 mod = angular.module('restangular-object-cache', ['restangular']);
 
 mod.service('RestangularObjectCache', function(Restangular) {
-  var HasManyDefinition, HasOneDefinition, ObjectCache, RelationshipsDefiner, addIndex, createTracking, guessKeyFromModelName, guessModelNameFromSingular, objectCaches, relationshipDefinitions, validateModelName, valuesAt, wireModel, wireRelationships;
+  var BelongsToDefinition, HasManyDefinition, HasOneDefinition, ObjectCache, RelationshipsDefiner, addIndex, createTracking, guessKeyFromModelName, guessModelNameFromSingular, objectCaches, relationshipDefinitions, validateModelName, valuesAt, wireModel, wireRelationships;
   guessKeyFromModelName = function(modelName) {
     return _.singularize(modelName) + "_id";
   };
@@ -36,19 +36,29 @@ mod.service('RestangularObjectCache', function(Restangular) {
     return HasManyDefinition;
 
   })();
-  HasOneDefinition = (function() {
-    function HasOneDefinition(methodName, options) {
+  BelongsToDefinition = (function() {
+    function BelongsToDefinition(methodName, options) {
       this.methodName = methodName;
       this.modelName = options.modelName || guessModelNameFromSingular(this.methodName);
       this.modelKey = options.key || guessKeyFromModelName(this.modelName);
       this.primaryKey = options.primaryKey || "id";
     }
 
-    HasOneDefinition.prototype.fullfillRelation = function(model) {
+    BelongsToDefinition.prototype.fullfillRelation = function(model) {
       var specificCache;
       specificCache = objectCaches[this.modelName];
       return specificCache.firstMatchingKey(this.primaryKey, model[this.modelKey]);
     };
+
+    return BelongsToDefinition;
+
+  })();
+  HasOneDefinition = (function() {
+    function HasOneDefinition(methodName, options) {
+      this.methodName = methodName;
+      this.modelName = options.modelName || guessModelNameFromSingular(this.methodName);
+      this.modelKey = options.foreignKey || guessKeyFromModelName(this.modelName);
+    }
 
     return HasOneDefinition;
 
@@ -69,16 +79,16 @@ mod.service('RestangularObjectCache', function(Restangular) {
       return this.definitions.push(definition);
     };
 
-    RelationshipsDefiner.prototype.hasOne = function(methodName, options) {
+    RelationshipsDefiner.prototype.belongsTo = function(methodName, options) {
       var definition;
       if (options == null) {
         options = {};
       }
-      definition = new HasOneDefinition(methodName, options);
+      definition = new BelongsToDefinition(methodName, options);
       return this.definitions.push(definition);
     };
 
-    RelationshipsDefiner.prototype.belongsTo = function(methodName, options) {
+    RelationshipsDefiner.prototype.hasOne = function(methodName, options) {
       if (options == null) {
         options = {};
       }
@@ -91,16 +101,20 @@ mod.service('RestangularObjectCache', function(Restangular) {
   ObjectCache = (function() {
     function ObjectCache(modelName, primaryKey) {
       this.modelName = modelName;
-      this.objects = {};
       this.primaryKey = primaryKey;
+      this.objects = {};
       this.indexes = {};
     }
 
     ObjectCache.prototype.addOrUpdateObject = function(object) {
       var id, index, key, name1, ref;
       id = object[this.primaryKey];
-      this.removeObject(object);
-      this.objects[id] = object;
+      if (id != null) {
+        this.removeObject(object);
+        this.objects[id] = object;
+      } else {
+
+      }
       ref = this.indexes;
       for (key in ref) {
         index = ref[key];
@@ -221,3 +235,5 @@ mod.service('RestangularObjectCache', function(Restangular) {
     return relationshipDefinitions = {};
   };
 });
+
+module.exports = mod;

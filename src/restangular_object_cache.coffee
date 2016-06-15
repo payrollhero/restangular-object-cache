@@ -27,7 +27,7 @@ mod.service 'RestangularObjectCache', (Restangular) ->
       specificCache = objectCaches[@modelName]
       specificCache.allMatchingKey(@modelKey, model[@primaryKey])
 
-  class HasOneDefinition
+  class BelongsToDefinition
     constructor: (methodName, options) ->
       @methodName = methodName
       @modelName = options.modelName || guessModelNameFromSingular(@methodName)
@@ -37,6 +37,13 @@ mod.service 'RestangularObjectCache', (Restangular) ->
     fullfillRelation: (model) ->
       specificCache = objectCaches[@modelName]
       specificCache.firstMatchingKey(@primaryKey, model[@modelKey])
+      
+  class HasOneDefinition
+    constructor: (methodName, options) ->
+      @methodName = methodName
+      @modelName = options.modelName || guessModelNameFromSingular(@methodName)
+      @modelKey = options.foreignKey || guessKeyFromModelName(@modelName)
+
 
   class RelationshipsDefiner
     constructor: (modelName) ->
@@ -48,24 +55,27 @@ mod.service 'RestangularObjectCache', (Restangular) ->
       definition = new HasManyDefinition(methodName, options)
       @definitions.push definition
 
-    hasOne: (methodName, options = {}) ->
-      definition = new HasOneDefinition(methodName, options)
+    belongsTo: (methodName, options = {}) ->
+      definition = new BelongsToDefinition(methodName, options)
       @definitions.push(definition)
 
-    belongsTo: (methodName, options = {}) ->
+    hasOne: (methodName, options = {}) ->
       @hasOne(methodName, options)
 
   class ObjectCache
     constructor: (modelName, primaryKey) ->
       @modelName = modelName
-      @objects = {}
       @primaryKey = primaryKey
+      @objects = {}
       @indexes = {}
 
     addOrUpdateObject: (object) ->
       id = object[@primaryKey]
-      @removeObject(object)
-      @objects[id] = object
+      if id?
+        @removeObject(object)
+        @objects[id] = object
+      else
+
       for key, index  of @indexes
         index[object[key]] ||= []
         index[object[key]].push(id)
@@ -161,3 +171,5 @@ mod.service 'RestangularObjectCache', (Restangular) ->
     relationshipDefinitions = {}
 
   return
+
+module.exports = mod;
