@@ -31,6 +31,6 @@
     "node": ">=0.10.0"
   },
   "scripts": {
-    "test": "gulp test",
+    "test": "gulp test"
   }
 }
