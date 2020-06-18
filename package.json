@@ -3,7 +3,7 @@
   "version": "0.0.5",
   "main": "dist/restangular-object-cache.js",
   "dependencies": {
-    "angular": "~1.7.9",
+    "angular": "~1.8.0",
     "underscore": "~1.7.0",
     "restangular": "~1.4.0",
     "underscore.inflection": "~1.2.0"
